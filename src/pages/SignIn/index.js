@@ -1,8 +1,17 @@
 import React, {useContext, useState } from 'react';
-import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
+import { TouchableOpacity, KeyboardAvoidingView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import {AuthContext} from '../../contexts/auth';
+import { 
+  BtnEntrar, 
+  BtnText, 
+  Container, 
+  ContainerInputs, 
+  Input, 
+  Link, 
+  Logo 
+} from './styles';
 
 export default function SignIn() {
   const navigation = useNavigation();
@@ -16,90 +25,47 @@ export default function SignIn() {
     logar(email, password)
   }
   return (
-   <View style={{backgroundColor: 'black', flex: 1}}>
-     <KeyboardAvoidingView style={styles.container}>
-      <Image 
+   <Container>
+     <KeyboardAvoidingView 
+      style={{
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}
+     >
+      <Logo 
         source={require('../../imgs/logo.png')}
-        style={styles.logo}
       />
-      <View style={styles.areaInput}>
-        <TextInput 
+      <ContainerInputs>
+        <Input 
           placeholder="Email"
           value={email}
           autoCorrect={false}
           autoCapitalize="none"
-          style={styles.input}
           placeholderTextColor="#fff"
           onChangeText={(text) => setEmail(text)}
         />
-        <TextInput 
+        <Input 
           placeholder="Senha"
           value={password}
           autoCorrect={false}
           autoCapitalize="none"
-          style={styles.input}
           placeholderTextColor="#fff"
           onChangeText={(text) => setPassword(text)}
           secureTextEntry={true}
         />
-      </View>
+      </ContainerInputs>
 
-      <TouchableOpacity onPress={Entrar} style={styles.areaBtn}>
-        <Text style={styles.textBtn}>Entrar</Text>
-      </TouchableOpacity>
+      <BtnEntrar onPress={Entrar}>
+        <BtnText>Entrar</BtnText>
+      </BtnEntrar>
 
       <TouchableOpacity>
-        <Text style={styles.link} onPress={() => navigation.navigate('SignUp')}>
+        <Link onPress={() => navigation.navigate('SignUp')}>
           Criar uma conta
-        </Text>
+        </Link>
       </TouchableOpacity>
      </KeyboardAvoidingView>
-   </View>
+   </Container>
   );
 }
-
-const styles = StyleSheet.create({
-  container:{
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  logo:{
-    width: 120,
-    height: 120,
-    marginBottom: 30
-  },
-  areaInput:{
-    flexDirection: 'column',
-    width: '90%'
-  },
-  input:{
-    backgroundColor: "#312D2D",
-    height: 47,
-    justifyContent: 'center',
-    marginBottom: 10,
-    fontSize: 18,
-    padding: 10,
-    borderRadius: 5,
-    color: 'white'
-  },
-  areaBtn:{
-    backgroundColor: "#35C744",
-    height: 47,
-    width: 120,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 5,
-    marginTop: 12
-  },
-  textBtn:{
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 22
-  },
-  link:{
-    color: '#6E6868',
-    fontSize: 16,
-    marginTop: 2
-  }
-})
