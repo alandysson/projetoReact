@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { View, StyleSheet, Text, FlatList, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState, useContext } from 'react';
+import { FlatList, ScrollView, TouchableOpacity } from 'react-native';
 import { Picker } from '@react-native-community/picker';
-
+import { Title, Container, ContainerButton, PickerStyled, Descricao, TextBtn } from "./styles.js"
 import { AuthContext } from '../../contexts/auth';
 import { format } from 'date-fns';
 import firebase from '../../services/firebaseConnection';
@@ -9,9 +9,9 @@ import firebase from '../../services/firebaseConnection';
 import ListaConsulta from '../Consultar/ListaConsulta';
 
 export default function Consultar() {
-    const [ mesC, setMesC] = useState(null);
+    const [ mes, setMes] = useState(null);
     let ano = format(new Date(), 'yyyy');
-    const [calendario, setCalendario] = useState([
+    const calendario = [
       {key: '01', nome: 'Janeiro'},
       {key: '02', nome: 'Fevereiro'},
       {key: '03', nome: 'Março'},
@@ -24,7 +24,7 @@ export default function Consultar() {
       {key: '10', nome: 'Outubro'},
       {key: '11', nome: 'Novembro'},
       {key: '12', nome: 'Dezembro'},
-    ]);
+    ];
 
     const [ saldo, setSaldo] = useState();
     const { user } = useContext(AuthContext);
@@ -36,18 +36,19 @@ export default function Consultar() {
       return <Picker.Item key={v.key} value={v.key} label={v.nome} />
     })
 
-    async function consDados(){
+    async function consultarDados(){
       setSaldo('00')
       await firebase.database().ref('users')
-      .child(uid).child(ano).child(mesC).once('value')
-      .then((snapshot) => {
-        setSaldo(snapshot.val().total);
-      }).catch(() => alert('Nenhum gasto registrado nesse mês'))  
+        .child(uid).child(ano).child(mes).once('value')
+        .then((snapshot) => {
+          setSaldo(snapshot.val().total);
+        })
+        .catch(() => alert('Nenhum gasto registrado nesse mês'))  
       
       await firebase.database().ref('historico')
-      .child(uid).child(ano).child(mesC).orderByChild('data')
-      .on('value', (snapshot) => {
-        setList([]);
+        .child(uid).child(ano).child(mes).orderByChild('data')
+        .on('value', (snapshot) => {
+          setList([]);
         
         snapshot.forEach((childItem) => {
           let lista = {
@@ -57,71 +58,37 @@ export default function Consultar() {
             data: childItem.val().data
           }
           setList(oldArray => [...oldArray, lista].reverse())
-          console.log(list)
         })
       })
     }
   
     return (
-      <View style={styles.container}>
-          <Text style={{color:"#fff", fontSize: 22, marginTop: 75, marginBottom: 22}}>Qual mês deseja consultar?</Text>
-          <Picker
-            selectedValue={mesC}
-            style={styles.picker}
+      <Container>
+          <Title>Qual mês deseja consultar?</Title>
+          <PickerStyled
+            selectedValue={mes}
             onValueChange={(itemValue, itemIndex) =>
-              setMesC(itemValue)
+              setMes(itemValue)
             }>
             {renderMes}            
-          </Picker>
+          </PickerStyled>
           
-          <View style={styles.areaBtn}>
-            <TouchableOpacity style={styles.btn} onPress={consDados}>
-              <Text style={styles.txtBtn}>Consultar</Text>
+          <ContainerButton>
+            <TouchableOpacity onPress={consultarDados}>
+              <TextBtn>Consultar</TextBtn>
             </TouchableOpacity>
-          </View>
+          </ContainerButton>
 
-          <Text style={{color:"#fff", fontSize: 19, marginTop: 30, marginBottom: 22}}>No mês {mesC} de {ano} você gastou: R${saldo}</Text>
-          <ScrollView style={styles.itens}>
+          <Descricao>
+            No mês {mes} de {ano} você gastou: R${saldo}
+          </Descricao>
+          <ScrollView style={{ margin: 20 }}>
             <FlatList 
               data={list}
               keyExtractor={(item) => item.key }
               renderItem={({item}) => (<ListaConsulta data={item} />)}
             />
           </ScrollView> 
-          
-      </View>
+      </Container>
     );
 }
-
-const styles = StyleSheet.create({
-  container:{
-    flex:1,
-    backgroundColor: '#000',
-    alignItems: 'center',
-  },
-
-  picker:{
-    display: 'flex',
-    color: 'white',
-    backgroundColor:'#312D2D',
-    width: 290,
-    borderRadius: 10
-  },
-  itens:{
-    margin: 20
-  },
-  areaBtn:{
-    width: 120,
-    height: 40,
-    backgroundColor: '#35C744',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 15,
-    borderRadius: 5,
-  },
-  txtBtn:{
-    color: 'white',
-    fontWeight: '700',
-    fontSize: 16
-  }
-})

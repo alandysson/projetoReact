@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, FlatList } from 'react-native';
 
 import { format } from 'date-fns';
 import firebase from '../../services/firebaseConnection';
-
+import { Container, Banner, TextDate, TextBanner } from "./styles.js"
 import {AuthContext} from '../../contexts/auth';
 import Lista from '../Lista';
 
@@ -45,42 +45,20 @@ export default function Home() {
   }, [])
 
   return (
-    <View style={styles.container}>
-      <View style={styles.principal}>
-        <Text style={{color: "white", fontSize: 30, fontStyle: "italic"}}>
+    <Container>
+      <Banner>
+        <TextBanner styleFont>
           {user && user.nome }
-        </Text>
-        <Text style={{fontSize: 40, color: 'white', fontWeight: 'bold'}}>- R${saldo}</Text>
-      </View>
-      <Text style={styles.data}>{data}</Text>
+        </TextBanner>
+        <TextBanner fontWidth textWeigth>- R${saldo}</TextBanner>
+      </Banner>
+      <TextDate>{data}</TextDate>
 
       <FlatList 
-          data={list}
-          keyExtractor={(item) => item.key }
-          renderItem={({item}) => (<Lista data={item} />)}
+        data={list}
+        keyExtractor={(item) => item.key }
+        renderItem={({item}) => (<Lista data={item} />)}
       />
-    </View>
+    </Container>
   );
 }
-
-const styles = StyleSheet.create({
-  container:{
-    backgroundColor: 'black',
-    flex: 1,
-  },
-  principal:{
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: "23%",
-    backgroundColor: '#35C744',
-    borderBottomLeftRadius: 50,
-    borderBottomRightRadius: 50
-  },
-  data:{
-    fontSize: 27, 
-    color: '#C0B4B4',
-    textAlign: 'center',
-    marginTop: 10, 
-    marginBottom: 20
-  },
-})
