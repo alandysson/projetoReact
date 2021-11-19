@@ -1,5 +1,5 @@
 import React from 'react';
-import { ContainerList, TextTitle, TextValue } from './styles.js';
+import { ContainerList, TextTitle, TextValue, AreaList } from './styles.js';
 
 export default function ListaConsulta({data}) {
   return (

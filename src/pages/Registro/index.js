@@ -15,6 +15,7 @@ export default function Registro() {
   const navigation = useNavigation();
   const [ tipo, setTipo ] = useState(null);
   const [ valor, setValor ] = useState();
+  const [verifyMonth, setVerifyMonth] = useState(null);
   const { user: userr} = useContext(AuthContext);
     
   function verificar(){
@@ -44,9 +45,21 @@ export default function Registro() {
     async function registrar(){
         let uid = userr.uid;
         let ano = format(new Date(), 'yyyy');
-        let mes = format(new Date(), 'MM')
-        let usuario =  firebase.database().ref('historico').child(uid).child(ano).child(mes);       
-
+        let mes = format(new Date(), 'MM');
+        let usuario =  firebase.database().ref('historico').child(uid).child(ano).child(mes);
+        let verify = firebase.database().ref('users').child(uid).child(ano).child(mes);
+        
+        await verify.on('value', (snapshot) => {
+            setVerifyMonth(snapshot.val())
+            console.log(snapshot.val())
+        })
+        if(verifyMonth === null){
+            console.log("a")
+            await firebase.database().ref('users').child(uid).child(ano).child(mes).set({
+                nome: userr.nome,
+                total: 0
+            })
+        }
         await usuario.child(tipo).set({
             tipo: tipo,
             valor: parseFloat(valor),

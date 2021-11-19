@@ -1,5 +1,5 @@
 import React, {useContext, useState, useEffect} from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { FlatList } from 'react-native';
 
 import { format } from 'date-fns';
 import firebase from '../../services/firebaseConnection';
@@ -21,7 +21,10 @@ export default function Home() {
       let ano = format(new Date(), 'yyyy');
       let mes = format(new Date(), 'MM')
       await firebase.database().ref('users').child(uid).child(ano).child(mes).on('value', (snapshot) => {
-        setSaldo(snapshot.val().total);
+        if(snapshot.val()?.total){
+          setSaldo(snapshot.val()?.total)
+        }
+        ;
         setData(format(new Date(), 'MM / yyyy'))
       });
 
@@ -50,15 +53,19 @@ export default function Home() {
         <TextBanner styleFont>
           {user && user.nome }
         </TextBanner>
-        <TextBanner fontWidth textWeigth>- R${saldo}</TextBanner>
+        <TextBanner fontWidth textWeigth>{saldo && `- R$ ${saldo}`}</TextBanner>
       </Banner>
       <TextDate>{data}</TextDate>
 
-      <FlatList 
-        data={list}
-        keyExtractor={(item) => item.key }
-        renderItem={({item}) => (<Lista data={item} />)}
-      />
+      {list.length > 0 ?
+        <FlatList 
+          data={list}
+          keyExtractor={(item) => item.key }
+          renderItem={({item}) => (<Lista data={item} />)}
+        />
+       : <TextDate>Ainda não há registros</TextDate>
+      }
+      
     </Container>
   );
 }
