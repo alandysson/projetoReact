@@ -1,27 +1,27 @@
-import React, {useContext, useState, useEffect} from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { FlatList } from 'react-native';
 
 import { format } from 'date-fns';
 import firebase from '../../services/firebaseConnection';
 import { Container, Banner, TextDate, TextBanner } from "./styles.js"
-import {AuthContext} from '../../contexts/auth';
+import { AuthContext } from '../../contexts/auth';
 import Lista from '../Lista';
 
 export default function Home() {
 
-  const [ saldo, setSaldo] = useState();
-  const [ data, setData ] = useState();
+  const [saldo, setSaldo] = useState();
+  const [data, setData] = useState();
   const { user } = useContext(AuthContext);
   const uid = user && user.uid;
 
   const [list, setList] = useState([]);
 
   useEffect(() => {
-    async function carregarSaldo(){
+    async function carregarSaldo() {
       let ano = format(new Date(), 'yyyy');
       let mes = format(new Date(), 'MM')
       await firebase.database().ref('users').child(uid).child(ano).child(mes).on('value', (snapshot) => {
-        if(snapshot.val()?.total){
+        if (snapshot.val()?.total) {
           setSaldo(snapshot.val()?.total)
         }
         ;
@@ -29,20 +29,20 @@ export default function Home() {
       });
 
       await firebase.database().ref('historico')
-      .child(uid).child(ano).child(mes).orderByChild('data')
-      .on('value', (snapshot) => {
-        setList([]);
-        
-        snapshot.forEach((childItem) => {
-          let lista = {
-            key: childItem.key,
-            tipo: childItem.val().tipo,
-            valor: childItem.val().valor,
-            data: childItem.val().data
-          }
-          setList(oldArray => [...oldArray, lista].reverse())
+        .child(uid).child(ano).child(mes).orderByChild('data')
+        .on('value', (snapshot) => {
+          setList([]);
+
+          snapshot.forEach((childItem) => {
+            let lista = {
+              key: childItem.key,
+              tipo: childItem.val().tipo,
+              valor: childItem.val().valor,
+              data: childItem.val().data
+            }
+            setList(oldArray => [...oldArray, lista].reverse())
+          })
         })
-      })
     }
     carregarSaldo();
   }, [])
@@ -51,21 +51,21 @@ export default function Home() {
     <Container>
       <Banner>
         <TextBanner styleFont>
-          {user && user.nome }
+          {user && user.nome}
         </TextBanner>
         <TextBanner fontWidth textWeigth>{saldo && `- R$ ${saldo}`}</TextBanner>
       </Banner>
       <TextDate>{data}</TextDate>
 
       {list.length > 0 ?
-        <FlatList 
+        <FlatList
           data={list}
-          keyExtractor={(item) => item.key }
-          renderItem={({item}) => (<Lista data={item} />)}
+          keyExtractor={(item) => item.key}
+          renderItem={({ item }) => (<Lista data={item} />)}
         />
-       : <TextDate>Ainda não há registros</TextDate>
+        : <TextDate>Ainda não há registros</TextDate>
       }
-      
+
     </Container>
   );
 }
