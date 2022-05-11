@@ -39,21 +39,26 @@ export default function Registro() {
         let uid = userr.uid;
         let ano = format(new Date(), 'yyyy');
         let mes = format(new Date(), 'MM')
-        let usuario =  firebase.database().ref('historico').child(uid).child(ano).child(mes);       
+        let hist =  firebase.database().ref('historico').child(uid).child(ano).child(mes);       
 
-        await usuario.child(tipo).set({
+        await hist.child(tipo).set({
             tipo: tipo,
             valor: parseFloat(valor),
             data: format(new Date(), 'dd, MM, yyyy')
         })
 
         let user = firebase.database().ref('users').child(uid);
+
+        user.child(ano).child(mes).set({
+            total : parseFloat(valor),
+        })
+
         await user.child(ano).child(mes).once('value').then((snapshot) => {
             let gastos = parseFloat(snapshot.val().total);
 
             valor >=0 ? gastos += parseFloat(valor) : gastos -= parseFloat(valor)
 
-            user.child(ano).child(mes).child('total').set(gastos);
+            user.child(ano).child(mes).child('total').set(gastos/2);
         })
 
         Keyboard.dismiss();

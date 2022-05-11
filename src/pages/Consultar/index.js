@@ -41,7 +41,8 @@ export default function Consultar() {
       await firebase.database().ref('users')
       .child(uid).child(ano).child(mesC).once('value')
       .then((snapshot) => {
-        setSaldo(snapshot.val().total);
+        let valor = snapshot.val().total;
+        { valor === null ? setSaldo(0) : setSaldo(valor) }
       }).catch(() => alert('Nenhum gasto registrado nesse mês'))  
       
       await firebase.database().ref('historico')

@@ -21,8 +21,13 @@ export default function Home() {
       let ano = format(new Date(), 'yyyy');
       let mes = format(new Date(), 'MM')
       await firebase.database().ref('users').child(uid).child(ano).child(mes).on('value', (snapshot) => {
-        setSaldo(snapshot.val().total);
-        setData(format(new Date(), 'MM / yyyy'))
+        if(snapshot.val().total === null){
+          alert('erro')
+        }else{
+          setSaldo(snapshot.val().total);
+          console.log('sucesso')
+        }
+        setData(format(new Date(), 'MM / yyyy'));
       });
 
       await firebase.database().ref('historico')

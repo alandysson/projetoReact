@@ -33,11 +33,9 @@ function AuthProvider({ children }) {
         await firebase.auth().createUserWithEmailAndPassword(email, password)
         .then(async (value) => {
             let uid = value.user.uid;
-            let ano = format(new Date(), 'yyyy');
-            let mes = format(new Date(), 'MM');
-            await firebase.database().ref('users').child(uid).child(ano).child(mes).set({
+
+            await firebase.database().ref('users').child(uid).set({
                 nome: nome,
-                total: 0
             })
             .then(() => {
                 let data = {
@@ -55,9 +53,7 @@ function AuthProvider({ children }) {
         await firebase.auth().signInWithEmailAndPassword(email, password)
         .then(async (value) => {
             let uid = value.user.uid
-            let ano = format(new Date(), 'yyyy');
-            let mes = format(new Date(), 'MM');
-            await firebase.database().ref('users').child(uid).child(ano).child(mes).once('value')
+            await firebase.database().ref('users').child(uid).once('value')
             .then((snapshot) => {
                 let data = {
                     uid: uid,
@@ -70,6 +66,7 @@ function AuthProvider({ children }) {
             })
         })
         .catch((error) => alert(error.code))
+
     }
 
     async function deslogar(){
